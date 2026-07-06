@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANTHANA BHARATHI — System Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DESIGN TOKENS — edit these to reskin the whole site
+     ============================================================ */
+  :root{
+    --bg:            #0D1418;
+    --bg-alt:        #121B21;
+    --card:          #16212A;
+    --card-border:   #24333D;
+    --ink:           #E9EDEF;
+    --ink-dim:       #8FA1AB;
+    --ink-faint:     #5A6E78;
+    --accent:        #4FD1A5;   /* status-green, sparingly */
+    --accent-dim:    #2C5D4C;
+    --amber:         #E8A94E;   /* secondary accent, used once per section max */
+    --danger:        #E1685E;
+
+    --font-display:  'Newsreader', Georgia, serif;
+    --font-body:     'Inter', -apple-system, sans-serif;
+    --font-mono:     'JetBrains Mono', 'Courier New', monospace;
+
+    --maxw: 1080px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
+  section{ padding:120px 24px; }
+  .wrap{ max-width:var(--maxw); margin:0 auto; }
+
+  ::selection{ background:var(--accent-dim); color:var(--ink); }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--accent); outline-offset:3px;
+  }
+
+  /* ---------- eyebrow / section labels (terminal-prompt motif) ---------- */
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--accent);
+    letter-spacing:.02em;
+    margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:"$"; color:var(--ink-faint); }
+
+  h2.section-title{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:clamp(28px,4vw,40px);
+    color:var(--ink);
+    margin-bottom:48px;
+    max-width:640px;
+  }
+
+  /* ============================================================
+     NAV
+     ============================================================ */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(13,20,24,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--card-border);
+  }
+  nav{
+    max-width:var(--maxw); margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px;
+  }
+  .logo{
+    font-family:var(--font-mono); font-size:15px; font-weight:600;
+    color:var(--ink); display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{
+    width:8px; height:8px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 8px var(--accent);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.35} }
+  .navlinks{ display:flex; gap:28px; font-size:14px; }
+  .navlinks a{ color:var(--ink-dim); transition:color .2s; }
+  .navlinks a:hover{ color:var(--accent); }
+  .navtoggle{ display:none; background:none; border:none; color:var(--ink); font-size:22px; cursor:pointer; }
+
+  @media(max-width:760px){
+    .navlinks{
+      position:fixed; top:60px; left:0; right:0; bottom:0;
+      background:var(--bg); flex-direction:column; padding:32px 24px;
+      transform:translateX(100%); transition:transform .3s ease;
+    }
+    .navlinks.open{ transform:translateX(0); }
+    .navtoggle{ display:block; }
+  }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  #hero{
+    min-height:100vh;
+    display:flex; align-items:center;
+    padding-top:140px;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.3fr .7fr; gap:56px; align-items:center;
+  }
+  @media(max-width:760px){ .hero-grid{ grid-template-columns:1fr; gap:40px; } }
+
+  .status-bar{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:12.5px; color:var(--accent);
+    background:rgba(79,209,165,.08);
+    border:1px solid var(--accent-dim);
+    padding:7px 14px; border-radius:100px;
+    margin-bottom:28px;
+  }
+  .status-bar .led{
+    width:7px; height:7px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 6px var(--accent); animation:pulse 2.4s ease-in-out infinite;
+  }
+
+  .hero-name{
+    font-family:var(--font-display); font-weight:500;
+    font-size:clamp(40px,6vw,68px);
+    line-height:1.05; color:var(--ink); margin-bottom:14px;
+  }
+  .hero-role{
+    font-family:var(--font-mono); font-size:16px; color:var(--ink-dim);
+    margin-bottom:24px;
+  }
+  .hero-role .cursor{ display:inline-block; width:8px; height:16px; background:var(--amber); margin-left:2px; animation:blink 1s step-end infinite; vertical-align:-2px;}
+  @keyframes blink{ 50%{opacity:0} }
+
+  .hero-tagline{
+    font-size:17px; color:var(--ink-dim); max-width:480px; margin-bottom:36px;
+  }
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; }
+
+  .btn{
+    font-family:var(--font-mono); font-size:13.5px; font-weight:500;
+    padding:13px 24px; border-radius:6px; cursor:pointer; border:1px solid transparent;
+    transition:transform .15s ease, background .2s ease, border-color .2s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-primary{ background:var(--accent); color:#0D1418; }
+  .btn-primary:hover{ background:#63e0b6; }
+  .btn-ghost{ border-color:var(--card-border); color:var(--ink); }
+  .btn-ghost:hover{ border-color:var(--accent); color:var(--accent); }
+
+  /* photo */
+  .photo-frame{
+    position:relative; width:100%; max-width:320px; margin:0 auto;
+    aspect-ratio:1/1; border-radius:16px; overflow:hidden;
+    border:1px solid var(--card-border);
+    background:linear-gradient(160deg,var(--card),var(--bg-alt));
+  }
+  .photo-frame img{ width:100%; height:100%; object-fit:cover; }
+  .photo-placeholder{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:10px;
+    color:var(--ink-faint); font-family:var(--font-mono); font-size:12px; text-align:center; padding:20px;
+  }
+  .photo-frame .corner-tag{
+    position:absolute; bottom:12px; left:12px; right:12px;
+    font-family:var(--font-mono); font-size:11px; color:var(--accent);
+    background:rgba(13,20,24,.75); border:1px solid var(--accent-dim);
+    padding:6px 10px; border-radius:6px; backdrop-filter:blur(4px);
+  }
+
+  /* ============================================================
+     ABOUT
+     ============================================================ */
+  #about{ background:var(--bg-alt); border-top:1px solid var(--card-border); border-bottom:1px solid var(--card-border); }
+  .about-grid{ display:grid; grid-template-columns:1.4fr 1fr; gap:64px; }
+  @media(max-width:760px){ .about-grid{ grid-template-columns:1fr; gap:40px; } }
+  .about-text p{ color:var(--ink-dim); font-size:16px; margin-bottom:16px; max-width:560px; }
+  .facts{ display:flex; flex-direction:column; gap:0; }
+  .fact{ display:flex; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--card-border); font-size:14px; }
+  .fact:first-child{ padding-top:0; }
+  .fact-label{ color:var(--ink-faint); font-family:var(--font-mono); }
+  .fact-value{ color:var(--ink); font-weight:500; }
+
+  /* ============================================================
+     SKILLS
+     ============================================================ */
+  .skills-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
+  @media(max-width:760px){ .skills-grid{ grid-template-columns:1fr; } }
+  .skill-cat{ background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:24px; }
+  .skill-cat h3{ font-family:var(--font-mono); font-size:13px; color:var(--amber); margin-bottom:18px; text-transform:uppercase; letter-spacing:.04em; }
+  .skill-row{ margin-bottom:14px; }
+  .skill-row:last-child{ margin-bottom:0; }
+  .skill-row-top{ display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:6px; }
+  .skill-row-top span:last-child{ color:var(--ink-faint); font-family:var(--font-mono); font-size:12px; }
+  .meter{ height:5px; background:var(--bg-alt); border-radius:3px; overflow:hidden; }
+  .meter-fill{ height:100%; background:var(--accent); border-radius:3px; }
+
+  /* ============================================================
+     EXPERIENCE (timeline)
+     ============================================================ */
+  #experience{ background:var(--bg-alt); border-top:1px solid var(--card-border); border-bottom:1px solid var(--card-border); }
+  .timeline{ position:relative; padding-left:28px; border-left:1px solid var(--card-border); }
+  .tl-item{ position:relative; padding-bottom:44px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{
+    content:""; position:absolute; left:-33px; top:4px;
+    width:9px; height:9px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 0 4px var(--bg-alt), 0 0 0 5px var(--card-border);
+  }
+  .tl-period{ font-family:var(--font-mono); font-size:12px; color:var(--accent); margin-bottom:6px; }
+  .tl-role{ font-size:18px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+  .tl-org{ font-size:14px; color:var(--ink-faint); margin-bottom:10px; }
+  .tl-desc{ color:var(--ink-dim); font-size:14.5px; max-width:600px; }
+
+  /* ============================================================
+     PROJECTS
+     ============================================================ */
+  .projects-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media(max-width:900px){ .projects-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:600px){ .projects-grid{ grid-template-columns:1fr; } }
+  .proj-card{
+    background:var(--card); border:1px solid var(--card-border); border-radius:10px;
+    padding:24px; display:flex; flex-direction:column; gap:12px;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .proj-card:hover{ border-color:var(--accent-dim); transform:translateY(-3px); }
+  .proj-icon{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
+  .proj-title{ font-size:17px; font-weight:600; color:var(--ink); }
+  .proj-desc{ font-size:13.5px; color:var(--ink-dim); flex-grow:1; }
+  .proj-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+  .tag{ font-family:var(--font-mono); font-size:10.5px; color:var(--accent); background:rgba(79,209,165,.08); border:1px solid var(--accent-dim); padding:3px 8px; border-radius:100px; }
+
+  /* ============================================================
+     EDUCATION + CERTS
+     ============================================================ */
+  #edu-cert{ background:var(--bg-alt); border-top:1px solid var(--card-border); border-bottom:1px solid var(--card-border); }
+  .ec-grid{ display:grid; grid-template-columns:1fr 1fr; gap:64px; }
+  @media(max-width:760px){ .ec-grid{ grid-template-columns:1fr; gap:48px; } }
+  .edu-item{ margin-bottom:28px; }
+  .edu-item:last-child{ margin-bottom:0; }
+  .edu-degree{ font-weight:600; font-size:16px; color:var(--ink); }
+  .edu-school{ font-size:14px; color:var(--ink-dim); margin:2px 0; }
+  .edu-year{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); }
+
+  .cert-list{ display:flex; flex-direction:column; gap:10px; }
+  .cert-item{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--card); border:1px solid var(--card-border); border-radius:8px;
+    padding:14px 18px; font-size:14px;
+  }
+  .cert-name{ color:var(--ink); font-weight:500; }
+  .cert-year{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); }
+
+  /* ============================================================
+     BLOG
+     ============================================================ */
+  .blog-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media(max-width:900px){ .blog-grid{ grid-template-columns:1fr; } }
+  .blog-card{ border:1px solid var(--card-border); border-radius:10px; padding:22px; background:var(--card); transition:border-color .2s; }
+  .blog-card:hover{ border-color:var(--accent-dim); }
+  .blog-date{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); margin-bottom:10px; }
+  .blog-title{ font-size:16px; font-weight:600; margin-bottom:8px; color:var(--ink); }
+  .blog-excerpt{ font-size:13.5px; color:var(--ink-dim); }
+
+  /* ============================================================
+     CONTACT
+     ============================================================ */
+  #contact{ background:var(--bg-alt); border-top:1px solid var(--card-border); }
+  .contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:64px; }
+  @media(max-width:760px){ .contact-grid{ grid-template-columns:1fr; gap:40px; } }
+  .contact-links{ display:flex; flex-direction:column; gap:16px; }
+  .contact-link{ display:flex; align-items:center; gap:12px; font-size:15px; color:var(--ink-dim); transition:color .2s; }
+  .contact-link:hover{ color:var(--accent); }
+  .contact-link .k{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); width:70px; flex-shrink:0; }
+
+  form{ display:flex; flex-direction:column; gap:14px; }
+  input, textarea{
+    width:100%; background:var(--card); border:1px solid var(--card-border); border-radius:8px;
+    padding:13px 16px; color:var(--ink); font-family:var(--font-body); font-size:14px;
+  }
+  textarea{ min-height:110px; resize:vertical; }
+  input::placeholder, textarea::placeholder{ color:var(--ink-faint); }
+
+  footer{ text-align:center; padding:36px 24px; font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="dot"></span>SANTHANA BHARATHI</div>
+    <button class="navtoggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <div class="navlinks" id="navLinks">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#edu-cert">Education</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ============================================================ HERO ============================================================ -->
+<section id="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="status-bar"><span class="led"></span> SYSTEM ONLINE · UPTIME <span id="uptime">00:00:00</span></div>
+      <h1 class="hero-name">SANTHANA BHARATHI</h1>
+      <div class="hero-role">System Engineer<span class="cursor"></span></div>
+      <p class="hero-tagline">I design, deploy, and keep infrastructure running — servers, networks, and the invisible plumbing that keeps everything else online.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-primary">Get in touch</a>
+        <a href="resume.pdf" class="btn btn-ghost" download>Download résumé</a>
+      </div>
+    </div>
+    <div class="photo-frame">
+      <img src="your-photo.jpg" alt="Your Name">
+      <div class="photo-placeholder">
+        <span style="font-size:28px;"></span>
+      </div>
+      <div class="corner-tag">status: awaiting upload</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ ABOUT ============================================================ -->
+<section id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="eyebrow">whoami</div>
+      <h2 class="section-title">About me</h2>
+      <div class="about-text">
+        <p>I'm a System Engineer based in Coimbatore, specializing in Windows server administration, network support, and enterprise IT infrastructure — with hands-on experience troubleshooting hardware, software, and connectivity issues across 25–75+ end-user systems. I'm particularly drawn to the reliability side of IT: keeping systems running, minimizing downtime, and making sure the infrastructure behind a business just works. I'm actively building toward deeper expertise in cloud computing and network security, and I'm driven by solving problems that have a direct, measurable impact on how smoothly a team operates.</p>
+        <p>My approach is collaborative and reliability-first — I work closely with IT and support teams to resolve issues efficiently and keep systems running smoothly, treating uptime and consistency as the real measure of good infrastructure work. I've also started building automation into my workflow, using scripts to handle repetitive tasks more efficiently, and I'm looking to expand that skill set as I take on more complex systems and network challenges.</p>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="fact-label">location</span><span class="fact-value">Coimbatore, India</span></div>
+      <div class="fact"><span class="fact-label">experience</span><span class="fact-value">1 year</span></div>
+      <div class="fact"><span class="fact-label">focus</span><span class="fact-value">Infrastructure & Server Administration with a growing Cloud/Automation</span></div>
+      <div class="fact"><span class="fact-label">availability</span><span class="fact-value">Open to work</span></div>
+      <div class="fact"><span class="fact-label">languages</span><span class="fact-value">English,Tamil,malayalam ...</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SKILLS ============================================================ -->
+<section id="skills">
+  <div class="wrap">
+    <div class="eyebrow">skills --list</div>
+    <h2 class="section-title">What I work with</h2>
+    <div class="skills-grid">
+      <div class="skill-cat">
+        <h3>Operating Systems</h3>
+        <div class="skill-row"><div class="skill-row-top"><span>Windows Server</span><span>90%</span></div><div class="meter"><div class="meter-fill" style="width:90%"></div></div></div>
+        <div class="skill-row"><div class="skill-row-top"><span>Mac</span><span>80%</span></div><div class="meter"><div class="meter-fill" style="width:80%"></div></div></div>
+      </div>
+      <div class="skill-cat">
+        <h3>Cloud & Virtualization</h3>
+        <div class="skill-row"><div class="skill-row-top"><span>AWS / Azure</span><span>75%</span></div><div class="meter"><div class="meter-fill" style="width:65%"></div></div></div>
+        <div class="skill-row"><div class="skill-row-top"><span>VMware</span><span>60%</span></div><div class="meter"><div class="meter-fill" style="width:80%"></div></div></div>
+      </div>
+      <div class="skill-cat">
+        <h3>Networking</h3>
+        <div class="skill-row"><div class="skill-row-top"><span>TCP/IP, DNS, VPN</span><span>85%</span></div><div class="meter"><div class="meter-fill" style="width:85%"></div></div></div>
+        <div class="skill-row"><div class="skill-row-top"><span>Firewalls & Security</span><span>90%</span></div><div class="meter"><div class="meter-fill" style="width:70%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ EXPERIENCE ============================================================ -->
+<section id="experience">
+  <div class="wrap">
+    <div class="eyebrow">history --list</div>
+    <h2 class="section-title">Experience</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-period">2025 — Present</div>
+        <div class="tl-role">SYSTEM ENGINEER</div>
+        <div class="tl-org">GLOSIL INTERNATIONAL PRIVATE LIMITED</div>
+        <div class="tl-desc">Identified the root cause of a recurring login and account access issue affecting employees, and implemented a configuration fix that significantly reduced resolution time on future occurrences — turning a repeat pain point into a fast, routine fix.</div>
+      </div>
+  </div>
+</section>
+
+<!-- ============================================================ PROJECTS ============================================================ -->
+<section id="projects">
+  <div class="wrap">
+    <div class="eyebrow">ls ./projects</div>
+    <h2 class="section-title">projects</h2>
+    <div class="projects-grid">
+      <div class="proj-card">
+        <div class="proj-icon">01</div>
+        <div class="proj-title">Real-Time Messaging Application</div>
+        <div class="proj-desc">Built a web-based, real-time chat application in Python using WebSocket-based communication (Flask-SocketIO), featuring user login and live message exchange between users. Designed and implemented independently, covering both backend logic (authentication, real-time connection handling) and browser-based frontend interaction.</div>
+        <div class="proj-tags"><span class="tag">windows</span><span class="tag">Ansible</span></div>
+      </div>
+  </div>
+</section>
+
+<!-- ============================================================ EDUCATION + CERTS ============================================================ -->
+<section id="edu-cert">
+  <div class="wrap ec-grid">
+    <div>
+      <div class="eyebrow">education --list</div>
+      <h2 class="section-title">Education</h2>
+      <div class="edu-item">
+        <div class="edu-degree">Bachelor of Science INFORMATION TECHNOLOGY</div>
+        <div class="edu-school">CMS COLLEGE OF SCIENCE AND COMMERCE</div>
+        <div class="edu-year">2022 — 2025</div>
+      </div>
+      <div class="edu-item">
+        <div class="edu-degree">HIGHER SECONDARY</div>
+        <div class="edu-school">St.Micheal's Higher Secondary School</div>
+        <div class="edu-year">2018 — 2020</div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow">certs --list</div>
+      <h2 class="section-title">Certifications</h2>
+      <div class="cert-list">
+        <div class="cert-item"><span class="cert-name">AI Concepts (Microsoft)</span><span class="cert-year">2024</span></div>
+        <div class="cert-item"><span class="cert-name">Cloud Computing Fundamentals (Microsoft)</span><span class="cert-year">2023</span></div>
+        <div class="cert-item"><span class="cert-name">Data Analysis Fundamentals (Microsoft)</span><span class="cert-year">2022</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ BLOG ============================================================ -->
+<section id="blog">
+  <div class="wrap">
+    <div class="eyebrow">blog --recent</div>
+    <h2 class="section-title">Notes & writing</h2>
+    <div class="blog-grid">
+      <a class="blog-card" href="#">
+        <div class="blog-date">May 2026</div>
+        <div class="blog-title">Daily Backup & Data Security</div>
+        <div class="blog-excerpt">Backup routines are easy to treat as a checkbox task, but their real value shows up in the moment something goes wrong: a failed drive, an accidental deletion, a security incident. A verified, full daily backup means recovery is fast and complete, not a scramble to figure out what was actually saved.</div>
+      </a>
+      <a class="blog-card" href="#">
+        <div class="blog-date">Dec 2025</div>
+        <div class="blog-title">Artificial Intelligence for IT Operations (AIOps)e</div>
+        <div class="blog-excerpt">AI analyzes logs, predicts failures, identifies anomalies, and automates repetitive operational tasks.
+Future infrastructures will use AI to reduce downtime before users even notice a problem.</div>
+      </a>
+      <a class="blog-card" href="#">
+        <div class="blog-date">Nov 2025</div>
+        <div class="blog-title">Performance Optimization</div>
+        <div class="blog-excerpt"> server tuning,
+Storage optimization,
+Memory allocation,
+Network optimization.
+Database optimization,
+Capacity planning</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CONTACT ============================================================ -->
+<section id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <div class="eyebrow">contact --init</div>
+      <h2 class="section-title">Let's talk</h2>
+      <p style="color:var(--ink-dim); margin-bottom:28px; max-width:420px;">Open to new opportunities, freelance work, or just a conversation about infrastructure. Reach out any of these ways.</p>
+      <div class="contact-links">
+        <a class="contact-link" href="santabharathi19@gmail.com"><span class="k">email</span> santabharathi19@gmail.com</a>
+        <a class="contact-link" href="tel:+919003918819"><span class="k">phone</span> +91 9003918819</a>
+        <a class="contact-link" href="https://www.linkedin.com/in/santhana-bharathi-k/" target="_blank"><span class="k">linkedin</span> in/santhana-bharathi-k</a>
+        <a class="contact-link" href="https://github.com/iamsantabharathi" target="_blank"><span class="k">github</span> /iamsantabharathi</a>
+      </div>
+    </div>
+    <form action="https://formspree.io/f/mbdvqjpr" method="POST">
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="Your email" required>
+      <textarea name="message" placeholder="Message" required></textarea>
+      <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Send message</button>
+    </form>
+  </div>
+</section>
+
+<footer>© <span id="year"></span> Your Name — built with care.</footer>
+
+<script>
+  // mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // uptime counter — ticks up from page load, playful nod to a sysadmin's world
+  const start = Date.now();
+  const uptimeEl = document.getElementById('uptime');
+  function pad(n){ return String(n).padStart(2,'0'); }
+  setInterval(() => {
+    const diff = Math.floor((Date.now() - start) / 1000);
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    uptimeEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }, 1000);
+</script>
+
+</body>
+</html>
